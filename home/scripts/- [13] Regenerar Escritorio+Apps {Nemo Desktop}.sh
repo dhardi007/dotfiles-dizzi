@@ -7,8 +7,6 @@
 # 2. Crea symlink de carpeta CustomRP_Icons para Wine
 # 3. Copia archivos .crp SUELTOS al Desktop de Wine (para CustomRP)
 # =================================================================================
-# /home/diego/scripts/crear_escritorio-CustomRP.sh
-
 # Colores para output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -306,6 +304,15 @@ print_step "Actualizando desktop database..."
 update-desktop-database "$ORIGEN" 2>/dev/null
 update-desktop-database /home/diego/.local/share/applications 2>/dev/null
 print_success "Base de datos actualizada"
+
+# =================================================================================
+# PASO 6: ACTUALIZAR ESCRITORIO Y ICONOS
+# =================================================================================
+
+print_header "PASO 6: ACTUALIZAR ESCRITORIO Y ICONOS"
+
+print_step "Actualizando escritorio y iconos..."
+/home/diego/add-icons-to-desktop.sh
 
 # =================================================================================
 # RESUMEN FINAL

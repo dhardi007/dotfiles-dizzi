@@ -1,82 +1,95 @@
 #!/bin/bash
-# ~/scripts/git_clean.sh - Con selector de repositorio
+# ~/scripts/git_clean.sh - Gestión completa de repositorios Git
 
 # ============================================
 # 1. SELECCIONAR REPOSITORIO
 # ============================================
 
-# Repositorio por defecto
-DEFAULT_REPO="$HOME/dotfiles-dizzi"
-
-# Lista de repositorios comunes (agrega los tuyos aquí)
+# Lista de repositorios comunes (agrega/quita según necesites)
 REPOS=(
   "$HOME/dotfiles-dizzi"
-  "$HOME/dotfiles-dizzi/nvim/.config/nvim/"
   "$HOME/dotfiles-wsl-dizzi"
-  "$HOME/dotfiles-dizzi/nvim-wsl/.config/nvim/"
-  "$HOME/workspace"
   "$HOME/workspace/GLAZE-WM-make-windows-pretty-main-dizzi"
   "$HOME/workspace/Proyecto-App-MCSD"
   "$HOME/workspace/REACT-Diego-Dizzi-Dashboard"
   "$HOME/workspace/portfolio-terminal-dhardi"
   "$HOME/workspace/Librezam"
   "$HOME/workspace/FCTicService.github.6c-Diego-05"
-  "$HOME/workspace/FCTicService.github.6c-Diego-05"
-  "$(pwd)" # Directorio actual
 )
+
+# Auto-detectar repos en carpetas comunes
+AUTO_DETECT_PATHS=(
+  "$HOME/workspace"
+  "$HOME/projects"
+  "$HOME/repos"
+  "$HOME/dotfiles-dizzi"
+  "$(pwd)"
+)
+
+# Buscar repos automáticamente
+for base_path in "${AUTO_DETECT_PATHS[@]}"; do
+  if [[ -d "$base_path" ]]; then
+    # Si es un repo, agregarlo
+    if [[ -d "$base_path/.git" ]]; then
+      REPOS+=("$base_path")
+    fi
+
+    # Buscar repos en subdirectorios (1 nivel)
+    if [[ -d "$base_path" && "$base_path" != "$(pwd)" ]]; then
+      for subdir in "$base_path"/*; do
+        if [[ -d "$subdir/.git" ]]; then
+          REPOS+=("$subdir")
+        fi
+      done
+    fi
+  fi
+done
+
+# Eliminar duplicados
+REPOS=($(printf '%s\n' "${REPOS[@]}" | sort -u))
 
 # Construir menú de repos existentes
 REPO_MENU=""
 for repo in "${REPOS[@]}"; do
-  # Verificar si es un repo git válido
   if [[ -d "$repo/.git" ]]; then
     REPO_NAME=$(basename "$repo")
     REPO_MENU+="󰊢  $REPO_NAME ($repo)\n"
   fi
 done
 
-# Agregar opción para escribir ruta manualmente
+# Agregar opción manual
 REPO_MENU+="  Escribir ruta manualmente"
 
-# Mostrar menú de selección
+# Mostrar menú
 SELECTED_REPO=$(echo -e "$REPO_MENU" | rofi -dmenu -p "Seleccionar Repositorio" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
 
-# Si canceló, salir
 [[ -z "$SELECTED_REPO" ]] && exit 0
 
-# Extraer ruta del repo seleccionado
+# Procesar selección
 if [[ "$SELECTED_REPO" == *"Escribir ruta"* ]]; then
-  # Pedir ruta manualmente
-  REPO_PATH=$(rofi -dmenu -p "Ruta del repositorio" -config ~/.config/rofi/config-power-grid.rasi)
+  REPO_PATH=$(rofi -dmenu -p "Ruta del repositorio (ej: ~/dotfiles-dizzi)" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 600px;}')
   [[ -z "$REPO_PATH" ]] && exit 0
+  REPO_PATH="${REPO_PATH/#\~/$HOME}"
 else
-  # Extraer ruta del paréntesis
   REPO_PATH=$(echo "$SELECTED_REPO" | grep -oP '\(.*?\)' | tr -d '()')
 fi
 
-# Expandir ~ a $HOME
-REPO_PATH="${REPO_PATH/#\~/$HOME}"
-
-# Verificar que sea un repo git válido
+# Validar repositorio
 if [[ ! -d "$REPO_PATH/.git" ]]; then
   notify-send -u critical "Git Clean" "❌ '$REPO_PATH' no es un repositorio Git válido"
   exit 1
 fi
 
-# Cambiar al directorio del repo
 cd "$REPO_PATH" || exit 1
-
-# Notificar repo seleccionado
 REPO_NAME=$(basename "$REPO_PATH")
-notify-send "Git Clean" "📂 Repositorio actual: $REPO_NAME\n📁 $REPO_PATH"
+notify-send "Git Clean" "📂 Repositorio: $REPO_NAME\n📁 $REPO_PATH"
 
 # ============================================
 # 2. SELECCIONAR ACCIÓN
 # ============================================
 
-ACTION=$(printf "  Limpieza normal\n  Limpieza profunda\n󰈈  Ver espacio\n󰚰  Filter-Repo\n󰈛  Eliminar historial" | rofi -dmenu -p "Git Clean" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1400px; height: 300px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
+ACTION=$(printf "  Limpieza normal\n  Limpieza profunda\n󰈈  Ver espacio\n󰚰  Filter-Repo\n󰈛  Eliminar historial\n  RESET 100%% (NUCLEAR)\n󰓦  Cambiar repositorio" | rofi -dmenu -p "Git Clean - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1400px; height: 350px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
 
-# Si canceló, salir
 [[ -z "$ACTION" ]] && exit 0
 
 # ============================================
@@ -84,6 +97,11 @@ ACTION=$(printf "  Limpieza normal\n  Limpieza profunda\n󰈈  Ver espacio\n󰚰
 # ============================================
 
 case "$ACTION" in
+*"Cambiar repositorio"*)
+  # Reiniciar script
+  exec "$0"
+  ;;
+
 *"Limpieza normal"*)
   kitty -e bash -c "
       cd '$REPO_PATH'
@@ -135,23 +153,173 @@ case "$ACTION" in
       echo ''
       echo '=== Tamaño del repositorio ==='
       du -sh .git
+      echo ''
+      echo '=== Análisis con dust ==='
+      command -v dust &>/dev/null && dust -d 3 .git || echo 'dust no instalado'
       read -p 'Presiona Enter para cerrar'
     "
   ;;
 
+*"RESET 100%"*)
+  # Advertencia especial para RESET
+  CONFIRM=$(printf "󰩖  CANCELAR\n󰚮  CONFIRMAR RESET 100%%" | rofi -dmenu -p "⚠️  RESET NUCLEAR - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 800px;} element {padding: 40px;}' -mesg "⚠️ ESTO HARÁ:
+1. Eliminará TODOS los commits del historial
+2. Eliminará archivos grandes (wallpapers, fonts, caches)
+3. Creará un commit inicial limpio desde cero
+4. Reducirá el tamaño del repo en ~90%
+
+💀 IRREVERSIBLE - Se creará backup en .git.backup
+
+¿Estás 100% seguro?")
+
+  if [[ "$CONFIRM" == *"CONFIRMAR"* ]]; then
+    kitty -e bash -c "
+      set -e
+      cd '$REPO_PATH'
+      
+      echo '╔═══════════════════════════════════════════════════════════╗'
+      echo '║  🔥 RESET 100%% - LIMPIEZA NUCLEAR                       ║'
+      echo '╠═══════════════════════════════════════════════════════════╣'
+      echo '║  📂 Repositorio: $REPO_NAME'
+      echo '║  📁 Ruta: $REPO_PATH'
+      echo '╚═══════════════════════════════════════════════════════════╝'
+      echo ''
+      
+      # Tamaño inicial
+      BEFORE_SIZE=\$(du -sh .git | awk '{print \$1}')
+      echo \"📊 Tamaño inicial: \$BEFORE_SIZE\"
+      echo ''
+      
+      # 1. Backup
+      echo '📦 [1/7] Creando backup de seguridad...'
+      cp -r .git .git.backup
+      echo '   ✓ Backup: .git.backup'
+      echo ''
+      
+      # 2. Mover archivos grandes
+      echo '🖼️  [2/7] Moviendo archivos grandes fuera de Git...'
+      mkdir -p ~/.local/share/dotfiles-assets
+      
+      if [[ -d wallpapers ]]; then
+        mv wallpapers ~/.local/share/dotfiles-assets/ 2>/dev/null || true
+        ln -sf ~/.local/share/dotfiles-assets/wallpapers wallpapers
+        echo '   ✓ Wallpapers movidos'
+      fi
+      
+      [[ -f font/.config/font/minecraft_font.ttc ]] && \
+        mv font/.config/font/minecraft_font.ttc ~/.local/share/dotfiles-assets/ 2>/dev/null || true
+      
+      echo ''
+      
+      # 3. Crear .gitignore
+      echo '📝 [3/7] Creando .gitignore...'
+      cat > .gitignore << 'EOFIGNORE'
+# Archivos grandes
+wallpapers/
+*.ttc
+*.ttf
+*.woff2
+
+# Caches
+*.cache
+*.pyc
+__pycache__/
+
+# Temporales
+*.tmp
+*.swp
+.DS_Store
+
+# Logs
+*.log
+
+# Específicos
+copyq/.config/copyq/*.dat
+local/.local/share/icons/*.cache
+nvim*/.config/nvim/spell/*.spl
+EOFIGNORE
+      echo '   ✓ .gitignore creado'
+      echo ''
+      
+      # 4. Detectar rama actual
+      echo '🌿 [4/7] Detectando rama actual...'
+      CURRENT_BRANCH=\$(git branch --show-current)
+      [[ -z \"\$CURRENT_BRANCH\" ]] && CURRENT_BRANCH=\"main\"
+      echo \"   ✓ Rama: \$CURRENT_BRANCH\"
+      echo ''
+      
+      # 5. Crear rama huérfana
+      echo '🔄 [5/7] Creando nuevo historial limpio...'
+      git checkout --orphan temp-clean-branch
+      git add -A
+      git commit -m \"🧹 Fresh start - Repo limpio desde cero
+
+✨ Cambios aplicados:
+- Historial resetado completamente
+- Archivos grandes movidos fuera de Git
+- .gitignore configurado
+- Tamaño reducido: \$BEFORE_SIZE → (calculando...)
+
+🚀 Generado por clean-git-RESET100%.sh\"
+      
+      echo '   ✓ Commit inicial creado'
+      echo ''
+      
+      # 6. Reemplazar rama vieja
+      echo '🗑️  [6/7] Eliminando historial antiguo...'
+      git branch -D \$CURRENT_BRANCH 2>/dev/null || true
+      git branch -m \$CURRENT_BRANCH
+      echo \"   ✓ Rama \$CURRENT_BRANCH actualizada\"
+      echo ''
+      
+      # 7. Optimizar
+      echo '⚡ [7/7] Optimizando repositorio...'
+      git reflog expire --expire=now --all
+      git gc --prune=now --aggressive
+      git repack -a -d
+      echo '   ✓ Optimización completada'
+      echo ''
+      
+      # Resultado
+      AFTER_SIZE=\$(du -sh .git | awk '{print \$1}')
+      
+      echo '╔═══════════════════════════════════════════════════════════╗'
+      echo '║  ✅ RESET 100%% COMPLETADO                               ║'
+      echo '╠═══════════════════════════════════════════════════════════╣'
+      echo \"║  Antes:   \$BEFORE_SIZE                                    ║\"
+      echo \"║  Después: \$AFTER_SIZE                                     ║\"
+      echo '║                                                           ║'
+      echo '║  💾 Backup: .git.backup                                   ║'
+      echo '║  🖼️  Assets: ~/.local/share/dotfiles-assets              ║'
+      echo '╚═══════════════════════════════════════════════════════════╝'
+      echo ''
+      echo '🚀 SIGUIENTE PASO:'
+      echo \"   git push -u origin \$CURRENT_BRANCH --force\"
+      echo ''
+      echo '⚠️  ADVERTENCIA: Esto reescribirá el historial remoto'
+      echo ''
+      read -p 'Presiona Enter para cerrar'
+    "
+
+    notify-send -u critical "Git Clean" "🔥 RESET 100% completado en $REPO_NAME\n⚠️ Ejecuta: git push --force"
+  else
+    notify-send "Git Clean" "❌ RESET cancelado"
+  fi
+  ;;
+
 *"Filter-Repo"*)
-  FILTER_CHOICE=$(printf "󰨞  Instalar filter-repo\n󰚰  Limpiar archivos grandes\n󰙆  Limpiar logs (*.log)\n󱁤  Limpiar temporales\n󰩺  Limpiar carpeta específica\n󰙴  Limpiar extensión específica" | rofi -dmenu -p "Filter-Repo" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 800px; height: 400px;}')
+  FILTER_CHOICE=$(printf "󰨞  Instalar filter-repo\n󰚰  Limpiar archivos grandes\n󰙆  Limpiar logs (*.log)\n󱁤  Limpiar temporales\n󰩺  Limpiar carpeta específica\n󰙴  Limpiar extensión específica" | rofi -dmenu -p "Filter-Repo - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;}')
 
   case "$FILTER_CHOICE" in
   *"Instalar filter-repo"*)
     kitty -e bash -c "
           echo 'Instalando git-filter-repo...'
-          pip install git-filter-repo
+          pip install --user git-filter-repo
           echo ''
           echo '✓ git-filter-repo instalado'
           read -p 'Presiona Enter para cerrar'
         "
-    notify-send "Git" "git-filter-repo instalado"
+    notify-send "Git" "✅ git-filter-repo instalado"
     ;;
 
   *"Limpiar archivos grandes"*)
@@ -167,25 +335,25 @@ case "$ACTION" in
             head -10 |
             numfmt --to=iec-i --suffix=B --field=1 --padding=7
           echo ''
-          read -p 'Ingresa el tamaño mínimo a eliminar (ej: 10M, 100K): ' SIZE
+          read -p 'Tamaño mínimo a eliminar (ej: 10M, 5M, 1M): ' SIZE
           
           if [[ -n \$SIZE ]]; then
               echo ''
               echo 'Creando backup en .git.backup...'
               cp -r .git .git.backup
               
-              echo 'Eliminando archivos mayores a \$SIZE...'
+              echo 'Eliminando archivos mayores a '\$SIZE'...'
               git filter-repo --strip-blobs-bigger-than \$SIZE --force
               
               echo ''
               echo '✓ Archivos grandes eliminados'
               echo '⚠️  Ejecuta: git push --force --all'
-              echo '💾 Backup disponible en: .git.backup'
+              echo '💾 Backup: .git.backup'
           fi
           
           read -p 'Presiona Enter para cerrar'
         "
-    notify-send "Git" "Archivos grandes eliminados de $REPO_NAME"
+    notify-send "Git" "✅ Archivos grandes eliminados de $REPO_NAME"
     ;;
 
   *"Limpiar logs"*)
@@ -194,13 +362,14 @@ case "$ACTION" in
           echo '📂 Repositorio: $REPO_NAME'
           echo ''
           echo 'Limpiando archivos .log del historial...'
+          cp -r .git .git.backup
           git filter-repo --path-glob '*.log' --invert-paths --force
           echo ''
-          echo '✓ Logs eliminados del historial'
+          echo '✓ Logs eliminados'
           echo '⚠️  Ejecuta: git push --force --all'
           read -p 'Presiona Enter para cerrar'
         "
-    notify-send "Git" "Logs eliminados de $REPO_NAME"
+    notify-send "Git" "✅ Logs eliminados de $REPO_NAME"
     ;;
 
   *"Limpiar temporales"*)
@@ -209,6 +378,7 @@ case "$ACTION" in
           echo '📂 Repositorio: $REPO_NAME'
           echo ''
           echo 'Limpiando archivos temporales...'
+          cp -r .git .git.backup
           git filter-repo \
             --path-glob 'tmp/*' \
             --path-glob 'temp/*' \
@@ -218,53 +388,55 @@ case "$ACTION" in
             --path-glob 'node_modules/*' \
             --invert-paths --force
           echo ''
-          echo '✓ Archivos temporales eliminados'
+          echo '✓ Temporales eliminados'
           echo '⚠️  Ejecuta: git push --force --all'
           read -p 'Presiona Enter para cerrar'
         "
-    notify-send "Git" "Temporales eliminados de $REPO_NAME"
+    notify-send "Git" "✅ Temporales eliminados de $REPO_NAME"
     ;;
 
   *"Limpiar carpeta específica"*)
-    FOLDER=$(rofi -dmenu -p "Carpeta a eliminar (ej: logs/, temp/)" -config ~/.config/rofi/config-power-grid.rasi)
+    FOLDER=$(rofi -dmenu -p "Carpeta a eliminar (ej: logs/, temp/)" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 600px;}')
     if [[ -n "$FOLDER" ]]; then
       kitty -e bash -c "
             cd '$REPO_PATH'
             echo '📂 Repositorio: $REPO_NAME'
             echo ''
             echo 'Eliminando carpeta: $FOLDER'
+            cp -r .git .git.backup
             git filter-repo --path '$FOLDER' --invert-paths --force
             echo ''
-            echo '✓ Carpeta $FOLDER eliminada del historial'
+            echo '✓ Carpeta eliminada del historial'
             echo '⚠️  Ejecuta: git push --force --all'
             read -p 'Presiona Enter para cerrar'
           "
-      notify-send "Git" "Carpeta '$FOLDER' eliminada de $REPO_NAME"
+      notify-send "Git" "✅ Carpeta '$FOLDER' eliminada de $REPO_NAME"
     fi
     ;;
 
   *"Limpiar extensión específica"*)
-    EXT=$(rofi -dmenu -p "Extensión a eliminar (ej: *.mp4, *.zip)" -config ~/.config/rofi/config-power-grid.rasi)
+    EXT=$(rofi -dmenu -p "Extensión (ej: *.mp4, *.zip, *.log)" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 600px;}')
     if [[ -n "$EXT" ]]; then
       kitty -e bash -c "
             cd '$REPO_PATH'
             echo '📂 Repositorio: $REPO_NAME'
             echo ''
             echo 'Eliminando archivos: $EXT'
+            cp -r .git .git.backup
             git filter-repo --path-glob '$EXT' --invert-paths --force
             echo ''
-            echo '✓ Archivos $EXT eliminados del historial'
+            echo '✓ Archivos eliminados del historial'
             echo '⚠️  Ejecuta: git push --force --all'
             read -p 'Presiona Enter para cerrar'
           "
-      notify-send "Git" "Extensión '$EXT' eliminada de $REPO_NAME"
+      notify-send "Git" "✅ Extensión '$EXT' eliminada de $REPO_NAME"
     fi
     ;;
   esac
   ;;
 
 *"Eliminar historial"*)
-  RESPONSE=$(printf "󰩖  Cancelar\n󰚮  Continuar (DESTRUCTIVO)" | rofi -dmenu -p "⚠️ ¿Eliminar TODO el historial de $REPO_NAME?" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 600px;}')
+  RESPONSE=$(printf "󰩖  Cancelar\n󰚮  Continuar (DESTRUCTIVO)" | rofi -dmenu -p "⚠️ ¿Eliminar TODO el historial de $REPO_NAME?" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 700px;} element {padding: 35px;}')
 
   if [[ "$RESPONSE" == *"Continuar"* ]]; then
     kitty -e bash -c "
@@ -274,12 +446,18 @@ case "$ACTION" in
         echo '⚠️  ADVERTENCIA: Eliminando TODO el historial'
         echo ''
         
-        # Detectar rama actual
-        CURRENT_BRANCH=\$(git branch --show-current)
-        echo 'Rama actual: \$CURRENT_BRANCH'
+        # Backup
+        cp -r .git .git.backup
+        echo '💾 Backup creado: .git.backup'
         echo ''
         
-        # Crear nueva rama huérfana
+        # Detectar rama
+        CURRENT_BRANCH=\$(git branch --show-current)
+        [[ -z \"\$CURRENT_BRANCH\" ]] && CURRENT_BRANCH=\"main\"
+        echo \"Rama actual: \$CURRENT_BRANCH\"
+        echo ''
+        
+        # Crear rama huérfana
         git checkout --orphan new-\$CURRENT_BRANCH
         git add -A
         git commit -m 'Fresh start - Historia reiniciada'
@@ -287,14 +465,17 @@ case "$ACTION" in
         # Eliminar rama vieja
         git branch -D \$CURRENT_BRANCH
         
-        # Renombrar nueva rama
+        # Renombrar
         git branch -m \$CURRENT_BRANCH
+        
+        # Optimizar
+        git gc --prune=now
         
         echo ''
         echo '✓ Historial eliminado'
         echo ''
         echo '⚠️  SIGUIENTE PASO:'
-        echo 'git push -u origin \$CURRENT_BRANCH --force'
+        echo \"git push -u origin \$CURRENT_BRANCH --force\"
         echo ''
         read -p 'Presiona Enter para cerrar'
       "
