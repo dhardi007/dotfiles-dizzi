@@ -1,0 +1,77 @@
+keybinds {
+  unbind "Ctrl o"
+	unbind "Alt h"
+	unbind "Alt j"
+	unbind "Alt k"
+	unbind "Alt l"
+	unbind "Alt n"
+	unbind "Alt p"
+  shared_except "locked" {
+    unbind "Ctrl o"
+		unbind "Alt h"
+		unbind "Alt j"
+		unbind "Alt k"
+		unbind "Alt l"
+		unbind "Alt n"
+		unbind "Alt p"
+    bind "Ctrl q" { Detach; }
+    bind "Ctrl s" { SwitchToMode "Session"; }
+    bind "Ctrl f" { SwitchToMode "Scroll"; }
+    bind "Ctrl h" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "move_focus";
+            payload "left";
+        };
+    }
+    bind "Ctrl j" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "move_focus";
+            payload "down";
+        };
+    }
+    bind "Ctrl k" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "move_focus";
+            payload "up";
+        };
+    }
+    bind "Ctrl l" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "move_focus";
+            payload "right";
+        };
+    }
+    bind "Ctrl Alt h" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "resize";
+            payload "left";
+        };
+    }
+    bind "Ctrl Alt j" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "resize";
+            payload "down";
+        };
+    }
+    bind "Ctrl Alt k" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "resize";
+            payload "up";
+        };
+    }
+    bind "Ctrl Alt l" {
+        MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.2.1/vim-zellij-navigator.wasm" {
+            name "resize";
+            payload "right";
+        };
+    }
+    bind "Alt Shift h" {
+				GoToPreviousTab;
+    }
+    bind "Alt Shift l" {
+				GoToNextTab;
+    }
+  }
+}
+
+theme "pywal"

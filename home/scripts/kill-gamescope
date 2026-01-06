@@ -1,0 +1,10 @@
+# ~/scripts/kill-gamescope
+#!/bin/bash
+killall gamescopereaper 2>/dev/null
+killall gamescope 2>/dev/null
+# killactive # en terminal:
+hyprctl dispatch killactive
+sleep 4
+killall hyprland-dialog
+ 
+# notify-send "🎮 Gamescope cerrado"

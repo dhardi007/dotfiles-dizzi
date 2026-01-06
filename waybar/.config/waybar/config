@@ -1,0 +1,299 @@
+{
+    // --- Configuración Principal ---
+    "layer": "top",
+    "position": "top",
+    "reload_style_on_change": true,
+    // --- Módulos a la Izquierda ---
+    "modules-left": [
+       "custom/logo",
+        "clock",
+    ],
+    // --- Módulos al Centro ---
+    "modules-center": [
+        "hyprland/workspaces"
+    ],
+    // --- Módulos a la Derecha ---
+    "modules-right": [
+        "custom/mpris",
+      "group/derecha_expandible",
+                              // Módulo para expandir el derecho
+   //     "tray",
+   // "custom/colorpicker",
+   //     "pulseaudio",
+  //   "group/networking",
+  //      "battery",
+  //     "custom/updates",
+  "custom/notification-center",
+  "custom/widgets-right",
+        "custom/poweroff"
+    ],
+    // --- Definiciones de Módulos ---
+    "custom/logo": {
+        "format": "󰣇",
+        "tooltip": false,
+        "on-click": "rofi -show drun"
+    },
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "show-special": true,
+        "format-icons": {
+            "1": "一",
+            "2": "二",
+            "3": "三",
+            "4": "四",
+            "5": "五",
+            "6": "六",
+            "7": "七",
+            "8": "八",
+            "9": "九",
+            "10": "十",
+            "music": "󰎆",
+            "magic": "  󰖳",
+            "urgent": "󰀨",
+            "active": "〇"
+        },
+        "persistent-workspaces": {
+            "*": [1, 2, 3]
+        }
+    },
+
+  "disk": {
+    "interval": 30,
+    "format": " {percentage_used}%",
+    "path": "/"
+  },
+  "memory": {
+    "format": " {percentage}%"
+  },
+  "cpu": {
+    "interval": 10,
+    "format": " {usage}%",
+    "format-icons": [
+      "▁",
+      "▂",
+      "▃",
+      "▄",
+      "▅",
+      "▆",
+      "▇",
+      "█"
+    ],
+  },
+    "custom/Lil-bro": {
+        "format": "2B, KAINE! ♥ 󰩗 ",
+        "tooltip": false
+    },
+  "clock": {
+        // Formato inicial: Tu mensaje de 2B/Kaine
+        "format": "2B, KAINE! ♥ 󰩗 ",
+
+        // Formato alternativo: La hora que quieres que aparezca al hacer clic
+        "format-alt": "{:%I:%M:%S %p}",
+
+        // El comando que cambia entre "format" y "format-alt"
+        "on-click": "waybar-toggle clock",
+
+        // El intervalo solo es necesario para el modo de reloj (format-alt)
+        "interval": 1,
+
+        // Puedes mantener el resto de tu configuración para el tooltip
+        "tooltip-format": "\n<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "calendar-weeks-pos": "right",
+        "today-format": "<span color='#7645AD'><b><u>{}</u></b></span>",
+        "format-calendar": "<span color='#aeaeae'><b>{}</b></span>",
+        "format-calendar-weeks": "<span color='#aeaeae'><b>W{:%V}</b></span>",
+        "format-calendar-weekdays": "<span color='#aeaeae'><b>{}</b></span>"
+    },
+  "group/derecha_expandible": {
+    "orientation": "horizontal",
+    "drawer": {
+        "transition-duration": 500,
+        "transition-left-to-right": false,
+        "pinned": false // Opcional: Si quieres que por defecto esté colapsado.
+    },
+    // Incluimos TODOS los módulos que quieres que se vean al expandir
+    "modules": [
+        "battery",
+        // "bluetooth",
+        "custom/updates",
+        "custom/colorpicker",
+        "network#speed", // Se muestra la velocidad de red (ya dentro de este grupo)
+        "network", // Se muestra el icono de red por defecto
+        "tray",
+        // "backlight"
+        "pulseaudio"
+        // Nota: He incluido 'network' y 'network#speed' directamente,
+        // ya que el grupo interno 'group/networking' no es necesario si
+        // los incluimos aquí. Si quieres mantener la sub-agrupación, ve
+        // a la sección de "Alternativa".
+    ]
+},
+  	"bluetooth": {
+		"format": "<span font='13'>󰂯</span>",
+		"format-disabled": "󰂲",
+		"format-connected": "",
+		"tooltip-format": "Devices connected: {num_connections}",
+		"on-click": "blueman-manager",
+    "on-click-right": "blueman-manager"
+	},
+  "temperature": {
+    "format": " {temperatureC}°C",
+    "format-critical": " {temperatureC}°C",
+    "interval": 1,
+    "critical-threshold": 80,
+    "on-click": "foot btop",
+  },
+
+    "custom/love": {
+        "format": "{} 󰩗 ",
+        "exec": "bun ~/dotfiles/polybar/.config/polybar/scripts/love.ts"
+    },
+    "custom/notification": {
+    "format": "{icon}",
+    "format-icons": {
+        "notification": "",
+        "none": "",
+        "dnd-notification": "",
+        "dnd-none": ""
+    },
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",        // ← Abrir panel
+    "on-click-right": "swaync-client -d -sw",  // ← Activar DND
+    "escape": true
+},
+      "custom/colorpicker": {
+    "format": "{}",
+    "return-type": "json",
+    "interval": "once",
+    "exec": "~/.config/waybar/scripts/colorpicker.sh -j",
+    "on-click": "sleep 1 && ~/.config/waybar/scripts/colorpicker.sh",
+  },
+
+    "battery": {
+        "interval": 10,
+        "states": {
+            "good": 95,
+            "warning": 30,
+            "critical": 20
+        },
+        "format": "{capacity}%  {icon} ",
+        "format-charging": "{capacity}% 󰂄 ",
+        "format-plugged": "{capacity}% 󰂄 ",
+        "format-alt": "{time} {icon}",
+        "format-icons": ["󰁻", "󰁼", "󰁾", "󰂀", "󰂂", "󰁹"]
+    },
+
+    "custom/updates": {
+        "return-type": "json",
+        "exec": "~/.config/waybar/scripts/myUpdates.sh",
+        "interval": 1800,
+        "on-click": "~/.config/waybar/scripts/myUpdates.sh click",
+        "on-click-right": "~/.config/waybar/scripts/myUpdates.sh click",
+          // ---   "on-click-right": "kitty -e sudo pacman -Syu" ---
+    },
+    "backlight": {
+    "format": " {percent}%",
+    "format-icons": ["", "󱩎", "󱩐"],
+    "device": "intel_backlight", // <-- ¡IMPORTANTE! Revisa tu dispositivo de brillo
+    "on-scroll-up": "brightnessctl set +5%",
+    "on-scroll-down": "brightnessctl set 5%-"
+},
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% 󰂰",
+        "format-muted": "<span font='12'>󰝟</span>",
+        "format-icons": {
+            "headphones": "",
+            "bluetooth": "󰥰",
+            "handsfree": "",
+            "headset": "󱡬",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["🕨", "🕩", "🕪"]
+        },
+        "justify": "center",
+        "on-click": "~/scripts/pavucontrol.sh",
+        "tooltip-format": "{icon}  {volume}%"
+    },
+
+    "network": {
+        "format-wifi": "",
+        "format-ethernet": "🖧",
+        "format-disconnected": "󰤠",
+        "tooltip-format": "{ipaddr}",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)  | {ipaddr}",
+        "tooltip-format-ethernet": "{ifname} 🖧 | {ipaddr}",
+        "on-click": "networkmanager_dmenu",
+        "on-click-right": "kitty nmtui" // ¡CORREGIDO para abrir en Kitty!
+    },
+
+    "network#speed": {
+        "format": "{bandwidthDownBits}",
+        "interval": 1,
+        "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}	⇡{bandwidthUpBytes}",
+        "tooltip-format-ethernet": "⇣{bandwidthDownBytes}	⇡{bandwidthUpBytes}",
+        "tooltip-format-disconnected": "Disconnected",
+        "on-click": "networkmanager_dmenu"
+    },
+
+    "group/networking": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 500,
+            "transition-left-to-right": false
+        },
+        "modules": ["network", "network#speed"]
+    },
+      "hyprland/window": {
+    "format": "( {class} )",
+    "rewrite": {
+      "(.*) - Mozilla Firefox": "🌎 $1",
+      "org.telegram.desktop": "> [$1]",
+      "org.gnome.Nautilus": "> [$1]",
+      "(.*) - zsh": "> [$1]"
+    }
+  },
+
+    "custom/poweroff": {
+        "format": "",
+        "on-click": "~/scripts/power_management.sh",
+        "on-click-right": "~/scripts/power_management.sh",
+        "return-type": "json",
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    },
+
+    "custom/mpris": {
+        "format": "{text}",
+        "tooltip": true,
+        "return-type": "json",
+        "exec": "~/.config/waybar/scripts/mpris-cover.sh",
+        "on-click": "playerctl --ignore-player=firefox,google-chrome,chromium play-pause",
+        "on-scroll-up": "playerctl --ignore-player=firefox,google-chrome,chromium next",
+        "on-scroll-down": "playerctl --ignore-player=firefox,google-chrome,googl,chromium previous",
+        "interval": 5,
+        "format-icons": {
+            "Playing": "▶",
+            "Paused": "⏸",
+            "Stopped": "♫"
+        },
+        "format-paused": "{icon_cover} {status} {title}",
+        "format-playing": "{icon_cover} {status} {title}",
+        "format-stopped": "{icon} No hay música reproduciéndose"
+    },
+	"custom/notification-center": {
+		"format": "󱧐",
+		"tooltip-format": "Notification center",
+		"on-click": "swaync-client -t"
+	},
+"custom/widgets-right": {
+    "format": "",
+        "tooltip-format": "Widgets",
+    "on-click": "~/scripts/launch_widgets.sh"
+}
+}

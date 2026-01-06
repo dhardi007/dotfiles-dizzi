@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# #######################################################################################
+# Configs DIZZI
+# #######################################################################################
+
+# Directorio de wallpapers
+WALL_DIR="$HOME/wallpapers/wallpapers/"
+cd "$WALL_DIR" || exit
+
+# Selección desde Rofi con previews
+SELECTED_WALL=$(for a in *.jpg *.png *.webp *.gif; do
+  echo -en "$a\0icon\x1f$a\n"
+done | rofi -dmenu -p " " -theme ~/.config/rofi/config-wallpaper.rasi)
+
+if [ -n "$SELECTED_WALL" ]; then
+  notify-send "🎨 Changing Theme" "Applying new wallpaper and updating colors..."
+
+  # Cambiar el fondo con swww
+  swww img "$WALL_DIR/$SELECTED_WALL" --transition-type='center' --transition-fps=30 --transition-step=2
+
+  # Generar paleta de colores con Pywal (silencioso)
+  wal -q -i "$WALL_DIR/$SELECTED_WALL"
+
+  # Recargar Waybar de manera eficiente
+  if pgrep -x waybar >/dev/null; then
+    pkill -RTMIN+1 waybar
+  else
+    waybar -c ~/.config/waybar/config &
+  fi
+
+  # #1 Recargar Eww solo si está corriendo
+  if pgrep -x eww >/dev/null; then
+    eww reload
+  fi
+
+  # 📌 AMBAS FORMAS VALIDAS DE RECARGAR EWW. 🚨
+
+  # #2- Recargar Eww matando el proceso primero
+  # killall eww 2>/dev/null || echo "Warning: No eww process found"
+  # eww open-many side-bar notifications
+  hyprctl reload
+  swaync-client -rs
+  notify-send "✅ Wallpaper aplicado" "Colores y temas actualizados correctamente"
+fi
+
+# 📌SI PREFIERES hyprpaper USA LO DE ABAJO. Arriba lo mismo pero con sww.. 🚨
+
+#!/bin/bash
+#
+# WALL_DIR="$HOME/wallpapers/wallpapers/"
+# cd "$WALL_DIR" || exit
+#
+# SELECTED_WALL=$(for a in *.jpg *.png *.gif *.webp; do
+#   echo -en "$a\0icon\x1f$a\n"
+# done | rofi -dmenu -p " " -theme ~/.config/rofi/config-wallpaper.rasi)
+#
+# if [ -z "$SELECTED_WALL" ]; then
+#   exit 0
+# fi
+#
+# WALL_FILE="$WALL_DIR/$SELECTED_WALL"
+#
+# notify-send "🎨 Changing Wallpaper" "$SELECTED_WALL"
+#
+# # Actualizar hyprpaper.conf solo si cambió
+# HP_CONF="$HOME/.config/hypr/hyprpaper.conf"
+# HP_LOCK="$HOME/.config/hypr/hyprlock.conf"
+#
+# grep -q "$WALL_FILE" "$HP_CONF" || sed -i -e "s|preload = .*|preload = $WALL_FILE|" \
+#   -e "s|wallpaper = ,.*|wallpaper = ,$WALL_FILE|" "$HP_CONF"
+#
+# grep -q "$WALL_FILE" "$HP_LOCK" || sed -i -e "s|path = .*|path = $WALL_FILE|" "$HP_LOCK"
+#
+# # Recargar HyprPaper sin reiniciar si ya está corriendo
+# if ! pgrep -x hyprpaper >/dev/null; then
+#   hyprpaper &
+# fi
+#
+# # Pywal
+# wal -q -i "$WALL_FILE"
+#
+# # Reiniciar Waybar de manera eficiente
+# if pgrep -x waybar >/dev/null; then
+#   pkill -RTMIN+1 waybar
+# else
+#   waybar -c ~/.config/waybar/config &
+# fi
+#
+# # Eww solo si está corriendo
+# if pgrep -x eww >/dev/null; then
+#   eww reload
+# hyprctl reload
+# swaync-client -rs
+# fi
+#
+# notify-send "✅ Wallpaper aplicado" "$SELECTED_WALL"

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Script para subir el brillo del teclado Dell
+DEVICE="dell::kbd_backlight"
+CURRENT_BRIGHTNESS=$(cat /sys/class/leds/$DEVICE/brightness)
+MAX_BRIGHTNESS=$(cat /sys/class/leds/$DEVICE/max_brightness)
+# Incrementa el brillo en 1 nivel
+NEW_BRIGHTNESS=$((CURRENT_BRIGHTNESS + 1))
+
+# Si el nuevo brillo no supera el máximo, aplícalo
+if [ "$NEW_BRIGHTNESS" -le "$MAX_BRIGHTNESS" ]; then
+    echo $NEW_BRIGHTNESS | sudo tee /sys/class/leds/$DEVICE/brightness
+fi

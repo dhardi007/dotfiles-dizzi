@@ -1,0 +1,10 @@
+term=alacritty
+location=center
+width=30%
+prompt= CLIPBOARD
+show=none
+insensitive=true
+allow_images=false
+hide_scroll=false
+
+

@@ -1,0 +1,69 @@
+# #######################################################################################
+# CONFIG de ZENITIES- THEMES - hayyaoe
+# #######################################################################################
+
+CHOICE=$(printf "󰜫\n\n󰣇\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n" | rofi -dmenu -replace -config ~/.config/rofi/config-power-grid.rasi)
+
+case "$CHOICE" in "")
+  sh ~/scripts/pavucontrol.sh
+  ;;
+"")
+  networkmanager_dmenu
+  ;;
+"")
+  sh ~/.config/eww/scripts/bluetuith.sh
+  ;;
+"")
+  sh ~/scripts/launch_widgets.sh
+  ;;
+"")
+  pactl set-source-mute @DEFAULT_SOURCE@ toggle
+  ;;
+"")
+  pactl set-sink-mute @DEFAULT_SINK@ toggle
+  ;;
+"󰺐")
+  kitty -e /usr/bin/scrcpy
+  ;;
+"")
+  sh ~/scripts/power_management.sh
+  ;;
+"")
+  sh ~/.config/eww/scripts/power-modes-fuzzel.sh
+  ;;
+"")
+  sh ~/.config/eww/scripts/toggle-game-mode.sh
+  ;;
+"󰂜")
+  sh ~/.config/eww/scripts/toggle-dnd.sh
+  swaync-client -t
+  ;;
+"")
+  sh ~/.config/eww/scripts/toggle-night-mode.sh
+  ;;
+"󰩫")
+  sh -c "scripts/gyazo-wayland-captura-clip"
+
+  ;;
+"")
+  sh -c "scripts/gyazo-wayland-captura-menu-rofi"
+  ;;
+"")
+  kitty -e ~/scripts/limpiar_cache.sh
+  ;;
+"")
+  sh ~/scripts/git_clean.sh
+  ;;
+"󰜫")
+  kitty -e ~/omarchy-arch-bin/omarchy-webapp-install
+  ;;
+"")
+  kitty -e ~/omarchy-arch-bin/omarchy-pkg-install
+  ;;
+"󰣇")
+  kitty -e ~/omarchy-arch-bin/omarchy-pkg-aur-install
+  ;;
+*)
+  exit 1
+  ;;
+esac

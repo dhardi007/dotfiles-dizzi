@@ -1,0 +1,64 @@
+#!/bin/bash
+# === Token de Gyazo ===
+API_TOKEN="p2aAJsU8VvSUmE_mYAGkNPmEoMxohL6K6UghjrXfMKc"
+
+# === Ruta temporal para la imagen ===
+IMG_PATH="/tmp/gyazo_$(date +%s).png"
+
+# === Flag para controlar si se sube a Gyazo ===
+SKIP_GYAZO=0 # ← NUEVA VARIABLE
+
+# === Menu: Seleccionar modo con rofi ===
+option=$(printf " Captura Ventana con Click\n  Ventana Activa (Auto)\n󰵝   Captura Completa Gyazo󰒊\n󰆟  Seleccionar Área\n󰒊 󰩫 Gyazo Share" | fuzzel --dmenu --prompt="Tipo de Captura:")
+
+pkill -9 rofi
+sleep 1
+
+# === Captura de pantalla ===
+if [[ "$option" == *"Click"* ]]; then
+  hyprshot -m window --freeze
+  sleep 0.5
+  HYPR_IMG=$(ls -t "$HOME/Pictures"/*.png "$HOME/Imágenes/"/*.png 2>/dev/null | head -1)
+  mv "$HYPR_IMG" "$IMG_PATH"
+
+elif [[ "$option" == *"Auto"* ]]; then
+  hyprctl -j activewindow | jq -r '"\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"' | grim -g - "$IMG_PATH"
+
+# ← AQUÍ ESTÁ EL CAMBIO PARA OPCIÓN 3
+elif [[ "$option" == *Completa* ]]; then
+  grim "$IMG_PATH"
+
+  # Si no hay token o está vacío, solo guardar localmente
+  if [ -z "$API_TOKEN" ] || [ "$API_TOKEN" == "" ]; then
+    SKIP_GYAZO=1
+    notify-send "📸 Sin token Gyazo" "Captura guardada localmente"
+  fi
+
+elif [[ "$option" == *Área* ]]; then
+  hyprshot -m region -o "$IMG_PATH"
+
+elif [[ "$option" == *Share* ]]; then
+  sh -c "scripts/gyazo-wayland-captura-clip"
+else
+  exit 1
+fi
+
+# === Subir SOLO si SKIP_GYAZO = 0 ===
+if [ $SKIP_GYAZO -eq 0 ] && ping -c 1 -W 1 gyazo.com &>/dev/null; then
+  response=$(curl -s -X POST https://upload.gyazo.com/api/upload \
+    -F "access_token=$API_TOKEN" \
+    -F "imagedata=@$IMG_PATH")
+
+  link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
+
+  if [ -n "$link" ]; then
+    wl-copy --type image/png <"$IMG_PATH"
+    echo -n "$link" | wl-copy --primary
+    xdg-open "$link" &
+    notify-send "Screenshot Saved" "$link" --icon="$IMG_PATH"
+  fi
+else
+  # Guardar sin subir
+  wl-copy --type image/png <"$IMG_PATH"
+  notify-send -i camera-photo "📸 Captura guardada" "$IMG_PATH"
+fi

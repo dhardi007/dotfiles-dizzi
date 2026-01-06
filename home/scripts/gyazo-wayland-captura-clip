@@ -1,0 +1,48 @@
+#!/bin/bash
+#/007   gyazo-wayland-captura-clip
+
+# === Configuración ===
+# === Token de Gyazo ===
+API_TOKEN="p2aAJsU8VvSUmE_mYAGkNPmEoMxohL6K6UghjrXfMKc"
+IMG_PATH="/tmp/gyazo_$(date +%s).png"
+
+# === Asegura entorno Wayland ===
+export WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-1}
+
+# === Captura de pantalla con grim y slurp ===
+grim -g "$(slurp)" "$IMG_PATH" || {
+  notify-send "❌ Captura cancelada"
+  exit 1
+}
+
+# === Copiar imagen como archivo binario al portapapeles ===
+wl-copy --type image/png <"$IMG_PATH"
+
+# === Verificar si hay token ===
+if [ -z "$API_TOKEN" ]; then
+  notify-send "📸 Sin token Gyazo" "Captura guardada localmente" --icon="$IMG_PATH"
+  exit 0
+fi
+
+# === Verificar conexión a Internet ===
+if ! ping -c 1 -W 1 gyazo.com &>/dev/null; then
+  notify-send "📸 Sin conexión" "Captura guardada localmente" --icon="$IMG_PATH"
+  exit 0
+fi
+
+# === Subida a Gyazo ===
+response=$(curl -s -X POST https://upload.gyazo.com/api/upload \
+  -F "access_token=$API_TOKEN" \
+  -F "imagedata=@$IMG_PATH")
+
+# === Extraer link del JSON ===
+link=$(echo "$response" | grep -o '"url":"[^"]*' | cut -d'"' -f4)
+
+# === Acciones finales ===
+if [ -n "$link" ]; then
+  echo -n "$link" | wl-copy --primary # copia también el link como texto por si acaso
+  xdg-open "$link" &
+  notify-send "Screnshoot Saved" "$link" --icon="$IMG_PATH"
+else
+  notify-send "❌ Error al subir a Gyazo"
+fi
