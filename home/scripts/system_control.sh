@@ -2,7 +2,7 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "󰜫\n\n󰣇\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n" | rofi -dmenu -replace -config ~/.config/rofi/config-power-grid.rasi)
+CHOICE=$(printf "󰜫\n\n󰣇\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
 
 case "$CHOICE" in "")
   sh ~/scripts/pavucontrol.sh

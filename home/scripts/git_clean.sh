@@ -15,6 +15,7 @@ REPOS=(
   "$HOME/workspace/portfolio-terminal-dhardi"
   "$HOME/workspace/Librezam"
   "$HOME/workspace/FCTicService.github.6c-Diego-05"
+  "$HOME/projects"
 )
 
 # Auto-detectar repos en carpetas comunes
@@ -23,6 +24,13 @@ AUTO_DETECT_PATHS=(
   "$HOME/projects"
   "$HOME/repos"
   "$HOME/dotfiles-dizzi"
+  "$HOME/dotfiles-wsl-dizzi"
+  "$HOME/workspace/GLAZE-WM-make-windows-pretty-main-dizzi"
+  "$HOME/workspace/Proyecto-App-MCSD"
+  "$HOME/workspace/REACT-Diego-Dizzi-Dashboard"
+  "$HOME/workspace/portfolio-terminal-dhardi"
+  "$HOME/workspace/Librezam"
+  "$HOME/workspace/FCTicService.github.6c-Diego-05"
   "$(pwd)"
 )
 
@@ -58,7 +66,7 @@ for repo in "${REPOS[@]}"; do
 done
 
 # Agregar opción manual
-REPO_MENU+="  Escribir ruta manualmente"
+REPO_MENU+="󰈞  Escribir ruta manualmente"
 
 # Mostrar menú
 SELECTED_REPO=$(echo -e "$REPO_MENU" | rofi -dmenu -p "Seleccionar Repositorio" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
@@ -67,9 +75,61 @@ SELECTED_REPO=$(echo -e "$REPO_MENU" | rofi -dmenu -p "Seleccionar Repositorio" 
 
 # Procesar selección
 if [[ "$SELECTED_REPO" == *"Escribir ruta"* ]]; then
-  REPO_PATH=$(rofi -dmenu -p "Ruta del repositorio (ej: ~/dotfiles-dizzi)" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 600px;}')
-  [[ -z "$REPO_PATH" ]] && exit 0
-  REPO_PATH="${REPO_PATH/#\~/$HOME}"
+  # Crear un archivo temporal con instrucciones para rofi
+  INSTRUCTIONS_TEMP=$(mktemp)
+  cat >"$INSTRUCTIONS_TEMP" <<'EOF'
+📝 ESCRIBIR RUTA MANUALMENTE
+
+Ejemplos de rutas válidas:
+• ~/dotfiles-dizzi
+• ~/workspace/mi-proyecto  
+• /home/usuario/repos/app
+• /ruta/completa/al/repo
+
+Escribe la ruta completa y presiona Enter
+EOF
+
+  while true; do
+    # Mostrar diálogo de entrada con instrucciones
+    REPO_PATH=$(echo -e "📝 Escribe la ruta completa del repositorio:\n\nEjemplos:\n• ~/dotfiles-dizzi\n• ~/workspace/mi-proyecto\n• /home/usuario/repos/app\n" | rofi -dmenu -p "Ruta del repositorio" \
+      -show run -config ~/.config/rofi/config-power-grid.rasi \
+      -theme-str 'window {width: 1600px; height: 400px;} entry {placeholder: "Ej: ~/mi-proyecto";}')
+
+    # Si cancela, salir
+    [[ -z "$REPO_PATH" ]] && exit 0
+
+    # Expandir ~ a HOME
+    REPO_PATH="${REPO_PATH/#\~/$HOME}"
+    REPO_PATH="${REPO_PATH//\~/$HOME}" # También reemplazar cualquier ~
+
+    # Validar que existe
+    if [[ ! -d "$REPO_PATH" ]]; then
+      ERROR_CHOICE=$(echo -e "󰩖  Reintentar\n󰜺  Cancelar" | rofi -dmenu -p "❌ Ruta no encontrada" \
+        -config ~/.config/rofi/config-power-grid.rasi \
+        -theme-str 'window {width: 1000px; height: 200px;} element {padding: 20px;}' \
+        -mesg "La ruta '$REPO_PATH' no existe.\n¿Quieres intentar de nuevo?")
+
+      [[ "$ERROR_CHOICE" != *"Reintentar"* ]] && exit 0
+      continue
+    fi
+
+    # Si existe pero no es repo Git
+    if [[ ! -d "$REPO_PATH/.git" ]]; then
+      ERROR_CHOICE=$(echo -e "󰩖  Reintentar\n󰜺  Cancelar" | rofi -dmenu -p "❌ No es un repositorio Git" \
+        -config ~/.config/rofi/config-power-grid.rasi \
+        -theme-str 'window {width: 1000px; height: 250px;} element {padding: 25px;}' \
+        -mesg "La carpeta existe pero no tiene .git:\n$REPO_PATH\n\n¿Quieres intentar con otra ruta?")
+
+      [[ "$ERROR_CHOICE" != *"Reintentar"* ]] && exit 0
+      continue
+    fi
+
+    # Ruta válida, salir del bucle
+    break
+  done
+
+  # Limpiar archivo temporal
+  rm -f "$INSTRUCTIONS_TEMP"
 else
   REPO_PATH=$(echo "$SELECTED_REPO" | grep -oP '\(.*?\)' | tr -d '()')
 fi
@@ -88,7 +148,7 @@ notify-send "Git Clean" "📂 Repositorio: $REPO_NAME\n📁 $REPO_PATH"
 # 2. SELECCIONAR ACCIÓN
 # ============================================
 
-ACTION=$(printf "  Limpieza normal\n  Limpieza profunda\n󰈈  Ver espacio\n󰚰  Filter-Repo\n󰈛  Eliminar historial\n  RESET 100%% (NUCLEAR)\n󰓦  Cambiar repositorio" | rofi -dmenu -p "Git Clean - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1400px; height: 350px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
+ACTION=$(printf "󰁨  Limpieza normal\n󰁨  Limpieza profunda\n󰈈  Ver espacio\n󰚰  Filter-Repo\n󰈛  Eliminar historial\n󰚮  RESET 100%% (NUCLEAR)\n󰓦  Cambiar repositorio" | rofi -dmenu -p "Git Clean - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1400px; height: 350px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
 
 [[ -z "$ACTION" ]] && exit 0
 
@@ -162,7 +222,7 @@ case "$ACTION" in
 
 *"RESET 100%"*)
   # Advertencia especial para RESET
-  CONFIRM=$(printf "󰩖  CANCELAR\n󰚮  CONFIRMAR RESET 100%%" | rofi -dmenu -p "⚠️  RESET NUCLEAR - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 800px;} element {padding: 40px;}' -mesg "⚠️ ESTO HARÁ:
+  CONFIRM=$(echo -e "󰩖  CANCELAR\n󰚮  CONFIRMAR RESET 100%%" | rofi -dmenu -p "⚠️  RESET NUCLEAR - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 800px;} element {padding: 40px;}' -mesg "⚠️ ESTO HARÁ:
 1. Eliminará TODOS los commits del historial
 2. Eliminará archivos grandes (wallpapers, fonts, caches)
 3. Creará un commit inicial limpio desde cero
@@ -269,7 +329,7 @@ EOFIGNORE
       echo '🗑️  [6/7] Eliminando historial antiguo...'
       git branch -D \$CURRENT_BRANCH 2>/dev/null || true
       git branch -m \$CURRENT_BRANCH
-      echo \"   ✓ Rama \$CURRENT_BRANCH actualizada\"
+      echo \"   ✓ Rama \$CURRENT_BANCH actualizada\"
       echo ''
       
       # 7. Optimizar
@@ -308,7 +368,7 @@ EOFIGNORE
   ;;
 
 *"Filter-Repo"*)
-  FILTER_CHOICE=$(printf "󰨞  Instalar filter-repo\n󰚰  Limpiar archivos grandes\n󰙆  Limpiar logs (*.log)\n󱁤  Limpiar temporales\n󰩺  Limpiar carpeta específica\n󰙴  Limpiar extensión específica" | rofi -dmenu -p "Filter-Repo - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;}')
+  FILTER_CHOICE=$(echo -e "󰨞  Instalar filter-repo\n󰚰  Limpiar archivos grandes\n󰙆  Limpiar logs (*.log)\n󱁤  Limpiar temporales\n󰩺  Limpiar carpeta específica\n󰙴  Limpiar extensión específica" | rofi -dmenu -p "Filter-Repo - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;}')
 
   case "$FILTER_CHOICE" in
   *"Instalar filter-repo"*)
@@ -436,7 +496,7 @@ EOFIGNORE
   ;;
 
 *"Eliminar historial"*)
-  RESPONSE=$(printf "󰩖  Cancelar\n󰚮  Continuar (DESTRUCTIVO)" | rofi -dmenu -p "⚠️ ¿Eliminar TODO el historial de $REPO_NAME?" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 700px;} element {padding: 35px;}')
+  RESPONSE=$(echo -e "󰩖  Cancelar\n󰚮  Continuar (DESTRUCTIVO)" | rofi -dmenu -p "⚠️ ¿Eliminar TODO el historial de $REPO_NAME?" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 700px;} element {padding: 35px;}')
 
   if [[ "$RESPONSE" == *"Continuar"* ]]; then
     kitty -e bash -c "

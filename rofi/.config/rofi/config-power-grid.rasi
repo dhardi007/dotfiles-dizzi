@@ -4,8 +4,6 @@
  * Sobrescribe la configuración del listview para forzar el layout de 2 filas / 3 columnas.
  */
 
-@import "~/.cache/wal/colors-rofi-dark.rasi"
-
 /**
  * Abuku Color Theme
  * User: Abuku
@@ -14,7 +12,8 @@
 
 configuration {
     modi:                       "drun,run";
-    font:                       "Font Awesome 6 Free 24";
+    font:                       "Hack 24";  /* CAMBIA ESTA LÍNEA */
+
 }
 
 window {
@@ -39,8 +38,38 @@ mainbox {
     spacing:                      0px;
     margin:                       0px;
     background-color:             transparent;
-    children:                     ["listbox"];
+    children:                     ["inputbar", "listbox"];
 }
+
+/* ===== BARRA DE BÚSQUEDA ===== */
+inputbar {
+    enabled:                     true;
+    spacing:                     10px;
+    padding:                     15px;
+    margin:                      0px 0px 10px 0px;
+    border:                      0px;
+    border-radius:               8px;
+    background-color:            @background;
+    children:                    ["prompt", "entry"];
+}
+
+prompt {
+    enabled:                     true;
+    padding:                     0px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+}
+
+entry {
+    enabled:                     true;
+    padding:                     0px 0px 0px 10px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    cursor:                      text;
+    placeholder:                 "";
+    placeholder-color:           @color5;
+}
+/* ===== FIN BARRA DE BÚSQUEDA ===== */
 
 listbox {
   enabled:                        true;
@@ -75,7 +104,6 @@ element {
     background-color: transparent;
     enabled: true;
     cursor: pointer;
-
 }
 
 element normal.normal {
@@ -98,4 +126,3 @@ message {
     background-color: red;
     border: 0px solid;
 }
-
