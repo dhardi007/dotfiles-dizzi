@@ -800,3 +800,7 @@ alias omarchy-webapp-install='bash ~/omarchy-arch-bin/omarchy-webapp-install'
 # Config para the clicker de CARGO/rust
 export PATH="$HOME/.cargo/bin:$PATH"
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
+# Si quieres cambiar el repo rápidamente sin menú: para darle uso a Windows +Z 󱞣
+                                                                            # /home/diego/scripts/git_clean.sh
+export GIT_CLEAN_REPO="$HOME/dotfiles-dizzi"
+

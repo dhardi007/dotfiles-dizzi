@@ -1402,10 +1402,12 @@ if [[ ! "$install_autoclickers" =~ ^[Nn]$ ]]; then
   echo -e "${BOLD}${GREEN}1. TheClicker${NC} (Rust, RECOMENDADO)"
   echo -e "${BOLD}${GREEN}2. ydotool${NC} (Universal)"
   echo -e "${BOLD}${GREEN}3. Flatpak Clicker${NC} (GUI)"
+  echo -e "${BOLD}${GREEN}4. Xclicker${NC} (GUI)"
   echo
   read -p "¿Instalar TheClicker? [S/n]: " install_theclicker
   read -p "¿Instalar ydotool? [s/N]: " install_ydotool
   read -p "¿Instalar Flatpak Clicker? [s/N]: " install_flatpak
+  read -p "¿Instalar Flatpak Clicker? [s/N]: " install_xclickerAUR
 
   # ═══════════════════════════════════════════════════════════
   # THECLICKER (CON PERMISOS INTEGRADOS)
@@ -1541,46 +1543,60 @@ EOL
     echo -e "  O busca 'Clicker' en tu launcher"
     echo
     echo -e "${YELLOW}⚠️  Nota:${NC} Requiere permisos de portal Wayland cada vez"
-    echo
   fi
+    # ═══════════════════════════════════════════════════════════
+    # XCLICKER (GUI)
+    # ═══════════════════════════════════════════════════════════
+    if [[ "$install_xclickerAUR" =~ ^[Ss]$ ]]; then
+      print_installing "Xclicker"
+      sudo pacman -S --needed --noconfirm xclicker
+      yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+        xclicker 2>/dev/null || print_warning "Xclicker falló"
+
+      print_success "Xclicker instalado"
+    else
+      print_warning "Xclicker omitido"
+    fi
+    echo -e "${GREEN}✅ Todos los clickers instalados${NC}"
 fi
 
 # ═════════════════════════════════════════════════════════════
-# PASP 24.5: PREMID - Omarchy Scripts Webpack, Arch Fzf Search
+# PASP 24.5: Omarchy Scripts Webpack, Arch Fzf Search
 # ═════════════════════════════════════════════════════════════
-print_step "24.5/35: Premid"
-if [[ "$install_premid" =~ ^[Ss]$ ]]; then
-  print_header "Instalando PreMiD"
+print_step "24.5/35: Ocharmy Scripts, Webpack, Arch Fzf Search"
+if [[ "$install_ocharmySripts" =~ ^[Ss]$ ]]; then
+  # print_header "Instalando PreMiD"
   print_header "Instalando dependencias para Omarchy Scripts [Webpack, Arch Fzf Search]"
 
   if command -v yay &>/dev/null; then
     yay -S --needed --noconfirm --answerdiff=None --answerclean=None premid gum curl xdg-utils desktop-file-utils 2>/dev/null || print_warning "PreMiD instalación falló"
   else
-    print_warning "yay no encontrado, instalando manualmente..."
-    cd /tmp
-    git clone --depth 1 https://aur.archlinux.org/premid.git
-    cd premid
-    makepkg -si --noconfirm
-    cd ~
-    rm -rf /tmp/premid
+    print_warning "yay no encontrado..."
+    # cd /tmp
+    # git clone --depth 1 https://aur.archlinux.org/premid.git
+    # cd premid
+    # makepkg -si --noconfirm
+    # cd ~
+    # rm -rf /tmp/premid
   fi
-
-  if command -v premid &>/dev/null; then
-    print_success "PreMiD instalado"
-
-    chmod +x ~/install-premid-presences.sh
-
-    echo
-    echo -e "${CYAN}Para instalar presences:${NC}"
-    echo -e "  Ejecuta: ${YELLOW}~/install-premid-presences.sh${NC}"
-    # Script de presences mejorado
-    ~/install-premid-presences.sh
-
-    echo
-  else
-    print_error "PreMiD no se instaló correctamente"
-  fi
+  #
+  # if command -v premid &>/dev/null; then
+  #   print_success "PreMiD instalado"
+  #
+  #   chmod +x ~/install-premid-presences.sh
+  #
+  #   echo
+  #   echo -e "${CYAN}Para instalar presences:${NC}"
+  #   echo -e "  Ejecuta: ${YELLOW}~/install-premid-presences.sh${NC}"
+  #   # Script de presences mejorado
+  #   ~/install-premid-presences.sh
+  #
+  #   echo
+  # else
+  #   print_error "PreMiD no se instaló correctamente"
+  # fi
 fi
+# ELIMINADO PREMID PORQUE NO DEJA EXPORTAR...
 
 # ═══════════════════════════════════════════════════════════
 # RESUMEN FINAL
