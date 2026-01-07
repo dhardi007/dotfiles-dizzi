@@ -106,6 +106,12 @@ element {
     cursor: pointer;
 }
 
+// PARA CENTAR LOS ICONOS, TESTO, GLYPHS
+element-text {
+    horizontal-align: 0.3;
+    vertical-align: 0.1;
+}
+
 element normal.normal {
     background-color: transparent;
 }

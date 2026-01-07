@@ -870,7 +870,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 17: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
-print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth)"
+print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas")"
 
 if [[ -d ~/dotfiles-dizzi/etc ]]; then
   print_status "Creando symlinks desde dotfiles a /etc"
@@ -919,6 +919,14 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
   if [[ -f ~/dotfiles-dizzi/etc/default/grub ]]; then
     print_package "Symlink: GRUB config"
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
+  fi
+
+  
+# Para solucionar gnome Keyring en SDDM y GNOME
+  if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
+    print_package "Symlink: SDDM pam.d para Gnome Keyring"
+    sudo pacman -S gnome-keyring --needed --noconfirm
+    sudo ln -sf ~/dotfiles-dizzi/etc/pam.d/sddm /etc/pam.d/sddm
   fi
 
   # Recargar servicios

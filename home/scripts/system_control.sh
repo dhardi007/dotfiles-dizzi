@@ -2,7 +2,7 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "󰜫\n\n󰣇\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
+CHOICE=$(printf "\n󰜫\n\n󰣇\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
 
 case "$CHOICE" in "")
   sh ~/scripts/pavucontrol.sh
@@ -62,6 +62,9 @@ case "$CHOICE" in "")
   ;;
 "󰣇")
   kitty -e ~/omarchy-arch-bin/omarchy-pkg-aur-install
+  ;;
+"")
+  kitty -e ~/scripts/show_githelp.sh
   ;;
 *)
   exit 1

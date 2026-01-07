@@ -69,7 +69,7 @@ done
 REPO_MENU+="󰈞  Escribir ruta manualmente"
 
 # Mostrar menú
-SELECTED_REPO=$(echo -e "$REPO_MENU" | rofi -dmenu -p "Seleccionar Repositorio" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
+SELECTED_REPO=$(echo -e "$REPO_MENU" | rofi -dmenu -p "󰊢   Seleccionar  Repositorio   " -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1000px; height: 400px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
 
 [[ -z "$SELECTED_REPO" ]] && exit 0
 
@@ -142,13 +142,13 @@ fi
 
 cd "$REPO_PATH" || exit 1
 REPO_NAME=$(basename "$REPO_PATH")
-notify-send "Git Clean" "📂 Repositorio: $REPO_NAME\n📁 $REPO_PATH"
+notify-send "󰊢  Git Clean" "📂 Repositorio: $REPO_NAME\n📁 $REPO_PATH"
 
 # ============================================
 # 2. SELECCIONAR ACCIÓN
 # ============================================
 
-ACTION=$(printf "󰁨  Limpieza normal\n󰁨  Limpieza profunda\n󰈈  Ver espacio\n󰚰  Filter-Repo\n󰈛  Eliminar historial\n󰚮  RESET 100%% (NUCLEAR)\n󰓦  Cambiar repositorio" | rofi -dmenu -p "Git Clean - $REPO_NAME" -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1400px; height: 350px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
+ACTION=$(printf "󰁨  Limpieza normal\n󰁨  Limpieza profunda\n󰈈  Ver espacio\n󰚰  Filter-Repo\n󰈛  Eliminar historial\n󰚮  RESET 100%% (NUCLEAR)\n󰓦  Cambiar repositorio" | rofi -dmenu -p "󰊢 󱎝 Git Clean -   $REPO_NAME  " -config ~/.config/rofi/config-power-grid.rasi -theme-str 'window {width: 1400px; height: 350px;} listview {columns: 3; spacing: 20px;} element {min-width: 260px; padding: 35px 30px;}')
 
 [[ -z "$ACTION" ]] && exit 0
 

@@ -231,9 +231,23 @@ rm -f /tmp/history
 # o 'history 0' que también debería funcionar para obtener todo el historial.
 # 'fc -l 1' es a menudo más robusto para obtener todo el historial sin límites.
 alias history='fc -l 1 > /tmp/history && cat /tmp/history'
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📂 ALIASES DE EXA (reemplazo moderno de ls)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # ls - 🖼️ Ver imágenes en la terminal
 alias ls='exa --icons --color=always'
+
+# Aliases NUEVOS (agregar estos):
+alias ll='exa -lha --icons --git --color=always'           # Detallado completo
+alias la='exa -a --icons --color=always'                   # Mostrar ocultos
+alias lt='exa -T --icons --color=always'                   # Árbol simple
+alias lta='exa -Ta --icons --color=always'                 # Árbol + ocultos
+alias ltl='exa -lTa --icons --git --color=always'          # Árbol detallado
+alias lsd='exa -D --icons --color=always'                  # Solo directorios
+alias lss='exa -lha --sort=size --reverse --icons'         # Por tamaño
+alias lst='exa -lha --sort=modified --reverse --icons'     # Por fecha
+
 # notepad estilo Windows
 notepad() {
   if [ $# -eq 0 ]; then
@@ -412,11 +426,6 @@ alias aicommit-showmodel='oco config get OCO_MODEL'
 # Alias adicionales útiles
 alias aicommitreset='oco config reset'  # Resetear configuración
 alias modellist='ollama list'  # Listar modelos disponibles
-
-# [eza] Buscar archivos, alternativas a ll y ls -a
-# 'll -a' # Listar enlaces y carpetas en el directorio actual
-# 'll -aT' # Listar carpetas y enlaces del home
-# 'll -l' # Listar enlaces en el directorio actual
 alias EspacioTotal='dust /*' # Tamaño de los archivos en el directorio actual
 # =============================================================================
 #                    GIT ALIASES Y FUNCIONES MEJORADAS
@@ -664,7 +673,8 @@ gitflow() {
   echo "     🚀 GIT WORKFLOW INTERACTIVO"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
-  echo "1. 📝 Commit con plantilla (abre editor)"
+  echo "0. 🚀 Editar commit actual  "
+  echo "1. 📝 Commit con plantilla (abre editor)  "
   echo "2. ⚡ Commit rápido (sin editor)"
   echo "3. 🤖 Commit con AI LOCAL (opencommit)"
   echo "4. 📦 Commit convencional (feat/fix/etc)"
@@ -672,12 +682,16 @@ gitflow() {
   echo "6. 📊 Ver log"
   echo "7. 📄 Editar plantilla de commit"
   echo "8. 📦 Revisar archivos historial de git"
-  echo "9. ❌ Cancelar"
+  echo "9. 🔁 Editar Commits históricos  "
+  echo "10. ❌ Cancelar"
   echo ""
   echo -n "Elige opción: "
   read option
 
   case $option in
+    0)
+      CommitEditar
+      ;;
     1)
       gitcommit
       ;;
@@ -725,6 +739,9 @@ TEMPLATE
       ;;
       #
     9)
+      CommitsHistorial
+      ;;
+    10)
       echo "❌ Cancelado"
       ;;
     *)
@@ -734,61 +751,10 @@ TEMPLATE
 }
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 💡 AYUDA
+#  💡 AYUDA COMPLETA DE GIT 󰊢  
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-githelp() {
-  cat << 'EOF'
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    🎯 GIT ALIASES - GUÍA RÁPIDA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📦 COMMITS:
-  gitcommit          → Commit rápido con mensaje por defecto
-  gitai              → Commit con AI (opencommit/oco)
-  gitc "mensaje"     → Commit con mensaje personalizado
-  gitconv            → Commit convencional interactivo
-  gitflow            → Menú interactivo completo
-  gitig              → Revisar archivos historial de git
-
-🔍 VISUALIZACIÓN:
-  gits               → Status compacto
-  gitlog             → Log visual con graph
-  gitlogfull         → Log detallado con colores
-  gitdiff            → Ver cambios sin stagear
-  gitdiffs           → Ver cambios staged
-
-⏪ DESHACER:
-  gitundo            → Deshacer último commit (mantiene cambios)
-  gitundobard        → Deshacer último commit (BORRA cambios)
-  CommitEditar       → Editar mensaje del último commit
-  CommitsHistorial   → Editar últimos 5 commits
-
-🌿 BRANCHES:
-  gitb               → Listar todas las branches
-  gitnew <nombre>    → Crear y cambiar a nueva branch
-  gitco <branch>     → Cambiar de branch
-  gitmerge <branch>  → Mergear branch
-
-🚀 PUSH/PULL:
-  gitpush            → Push normal (git push)
-  gitpushforce       → Push forzado (con --force-with-lease)
-  gitpull            → Pull con rebase
-  gitsync            → Sincronizar fork con upstream
-
-🧹 LIMPIEZA:
-  gitclean           → Eliminar branches mergeadas
-  gitcleanfiles      → Eliminar archivos no trackeados
-  gitreset           → Reset completo al último commit
-
-📊 ESTADÍSTICAS:
-  gitstats           → Ver contribuciones por autor
-  gitsize            → Ver tamaño del repositorio
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EOF
-}
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+alias githelp='bash ~/scripts/git-help.sh'
 
 # Pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
