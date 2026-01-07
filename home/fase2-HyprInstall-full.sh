@@ -858,7 +858,7 @@ if [[ -d ~/dotfiles-dizzi ]]; then
 
   print_status "Aplicando dotfiles con stow..."
 
-  for pkg in kdenlive-compressor-editor sattyScreenshots Antigravity nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart copyq dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons firefox vscode cursor manual-ln htop neofetch tmux polybar bottom starship nixconf qtile; do
+  for pkg in kdenlive-compressor-editor sattyScreenshots Antigravity nwg-gtk-3.0 nwg-gtk-4.0 qt5ct qt6ct thunar ibus Raycast-vicinae fuzzel-glyphs-rofimoji autostart copyq dunst easyeffects swaync espanso eww fastfetch font ghostty home hypr kew kitty local nvim rofi systemd themes wal wallpapers waybar wireplumber wofi yazi zsh input-remapper quickshell caelestia icons firefox vscode cursor manual-ln htop neofetch tmux polybar bottom starship qtile; do
     if [[ -d $pkg ]]; then
       print_package "Stow: $pkg"
       stow $pkg 2>/dev/null || print_warning "Stow falló para $pkg"
