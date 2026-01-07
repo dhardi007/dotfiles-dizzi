@@ -111,7 +111,6 @@ done 2>/dev/null) &
 SUDO_PID=$!
 trap "kill $SUDO_PID 2>/dev/null" EXIT
 
-
 # ═══════════════════════════════════════════════════════════
 # PASO 25.5: GRUB (CORREGIDO - Faltaba fi)
 # ═══════════════════════════════════════════════════════════
@@ -191,7 +190,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 17: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
-print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas")"
+print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
 
 if [[ -d ~/dotfiles-dizzi/etc ]]; then
   print_status "Creando symlinks desde dotfiles a /etc"
@@ -242,8 +241,7 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     sudo ln -sf ~/dotfiles-dizzi/etc/default/grub /etc/default/
   fi
 
-  
-# Para solucionar gnome Keyring en SDDM y GNOME
+  # Para solucionar gnome Keyring en SDDM y GNOME
   if [[ -f ~/dotfiles-dizzi/etc/pam.d/sddm ]]; then
     print_package "Symlink: SDDM pam.d para Gnome Keyring"
     sudo pacman -S gnome-keyring --needed --noconfirm

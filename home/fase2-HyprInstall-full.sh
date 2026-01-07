@@ -872,7 +872,7 @@ fi
 # ═══════════════════════════════════════════════════════════
 # PASO 17: SYMLINKS A /etc
 # ═══════════════════════════════════════════════════════════
-print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas")"
+print_step "17/35: Symlinks a /etc (udev/polkit/bluetooth/pam.d) para Gnome Keyring y mas"
 
 if [[ -d ~/dotfiles-dizzi/etc ]]; then
   print_status "Creando symlinks desde dotfiles a /etc"
