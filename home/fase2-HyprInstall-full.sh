@@ -87,6 +87,8 @@ cat <<"EOF"
 EOF
 
 echo -e "${GREEN}${BOLD}Esta instalación incluye:${NC}"
+echo "  • Configuraciones de Grub Mine-Craft"
+echo "  • Algunos scripts de Omarchy [webpack, arch install]"
 echo "  • Hyprland + Waybar + Rofi + Dunst + Swaync"
 echo "  • Audio: PipeWire + EasyEffects"
 echo "  • Gaming: Steam, Lutris, Wine (INTERACTIVO)"
@@ -2401,6 +2403,7 @@ cat <<"EOF"
 ║  ✅ Python-pywal + Oh-My-Posh + Rofimoji                             ║
 ║  ✅ Ollama + opencommit (si seleccionado)                            ║
 ║  ✨ SDDM Astronaut Theme configurado interactivamente                ║
+║  ✅  Grub Mine-Craft 󰍳 restaurado correctamente                     ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
 EOF
