@@ -354,6 +354,7 @@ eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDob
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
+
 # ═══════════════════════════════════════════════════════════
 # Configuración de opencommit (oco) con Ollama ~ [opencommit]
 # ═══════════════════════════════════════════════════════════
@@ -642,9 +643,6 @@ gitsync() {
 # 🧹 LIMPIEZA
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# Limpiar branches mergeadas
-alias gitclean='git branch --merged | grep -v "\*" | xargs -n 1 git branch -d'
-
 # Limpiar archivos no trackeados
 alias gitcleanfiles='git clean -fd'
 
@@ -755,6 +753,7 @@ TEMPLATE
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 alias githelp='bash ~/scripts/git-help.sh'
+alias gitclean='bash ~/scripts/git_clean.sh'
 
 # Pyenv configuration
 export PYENV_ROOT="$HOME/.pyenv"
@@ -768,5 +767,10 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export YDOTOOL_SOCKET=/tmp/.ydotool_socket
 # Si quieres cambiar el repo rápidamente sin menú: para darle uso a Windows +Z 󱞣
 export GIT_CLEAN_REPO="$HOME/dotfiles-dizzi"
-                                                                            # /home/diego/scripts/git_clean.sh
-
+                                                    
+# ═══════════════════════════════════════════════════════════
+# Editor por defecto (Git, etc)
+# ═══════════════════════════════════════════════════════════
+export EDITOR="nvim"
+export VISUAL="nvim"
+export GIT_EDITOR="nvim"
