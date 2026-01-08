@@ -83,7 +83,7 @@
         {
           "label": "󰤨",
           "type": "toggle",
-          "command": "networkmanager_dmenu",
+          "command": "/home/diego/scripts/wifi-toggle.sh",
           "update-command": "sh -c 'nmcli radio wifi | grep -q enabled && echo true || echo false'"
         },
         {
