@@ -2,7 +2,7 @@
 # CONFIG de ZENITIES- THEMES - hayyaoe
 # #######################################################################################
 
-CHOICE=$(printf "\n󰜫\n\n󰣇\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
+CHOICE=$(printf "\n󰣇\n\n󰜫\n\n\n\n󰂜\n\n\n\n\n\n\n󰩫\n\n󰺐\n\n\n\n 󰬺\n 󰬻\n󰋊󰬼" | rofi -dmenu -p "󱍕         " -replace -config ~/.config/rofi/config-power-grid.rasi)
 
 case "$CHOICE" in "")
   sh ~/scripts/pavucontrol.sh
@@ -65,6 +65,20 @@ case "$CHOICE" in "")
   ;;
 "")
   kitty -e ~/scripts/show_githelp.sh
+  ;;
+" 󰬺")
+  # Fase 1 de la instalación de Hyprland, en ROOT
+  kitty -e ~/HYPER-arch-INSTALL.sh
+  ;;
+" 󰬻")
+  # Fase 2 de la instalación de Hyprland, con usuario normal
+  # su diego
+  kitty -e ~/fase2-HyprInstall-full.sh
+  ;;
+"󰋊󰬼")
+  # Es el mismo que el fase 2 pero post particion para reparar grub
+  # su diego
+  kitty -e ~/repair-grub-fase2-HyprInstall-post-Particionar.sh
   ;;
 *)
   exit 1

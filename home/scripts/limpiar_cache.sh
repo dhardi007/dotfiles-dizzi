@@ -16,7 +16,7 @@ while true; do
   clear
   echo -e "${CYAN}${BOLD}"
   echo "╔════════════════════════════════════════════════════════════╗"
-  echo "║        ⚙️  Limpiar caché y dependencias - MENÚ            ║"
+  echo "║        ⚙️  Limpiar caché y dependencias - MENÚ             ║"
   echo "╚════════════════════════════════════════════════════════════╝"
   echo -e "${RESET}"
   echo -e "${BLUE}  1)${RESET} Limpiar caché de pacman ${BOLD}󰮯${RESET} ${DIM}(sudo)${RESET}"
