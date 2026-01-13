@@ -273,9 +273,10 @@ sudo pacman -S --needed --noconfirm \
   yazi stow ranger imagemagick \
   inotify-tools acpi power-profiles-daemon cpupower \
   gparted partitionmanager udiskie \
-  tig git-filter-repo man-db fastfetch networkmanager-dmenu gedit hyprsunset rsync gnome-system-monitor
+  tig git-filter-repo man-db fastfetch bluetui impala networkmanager-dmenu gedit hyprsunset rsync gnome-system-monitor
 
 print_installing "Utilidades extra AUR (pokemon-colorscripts, cava, zoxide)"
+print_installing "Interfaces: bluetui, impala. Para gestionar el Bluetooth y Wifi [mismos devs]"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   pokemon-colorscripts cmatrix cava zoxide thefuck \
   2>/dev/null || print_warning "Algunas utilidades AUR fallaron"
@@ -822,6 +823,10 @@ sudo pacman -S --needed --noconfirm \
   docker docker-compose rust \
   llvm clang patchelf git github-cli tgpt
 
+yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
+  claude-code gemini-cli-git
+print_success "Gemini, TGPT, Claude instaladas. Para Deepseek y modelos local usa: Ollama"
+
 sudo systemctl enable docker
 sudo usermod -aG docker $USER
 
@@ -1011,6 +1016,25 @@ if [[ -d ~/dotfiles-dizzi/etc ]]; then
     print_status "Recuerda usar:
     sudo systemctl restart systemd-logind   O reiniciar el sistema
     systemctl status systemd-logind   para ver si se ejecuto"
+  fi
+
+  # Para solucionar initramfs-linux [/etc/mkinitcpio.conf] Tambien puedes consultar el historial root para guiarte con:
+  if [[ -f ~/dotfiles-dizzi/etc/mkinitcpio.conf ]]; then
+    print_package "Symlink: FIX initramfs-linux"
+    sudo ln -sf ~/dotfiles-dizzi/etc/mkinitcpio.conf /etc/mkinitcpio.conf
+    cat ~/dotfiles-dizzi/historial-root-FIX-initramfs-linux.txt
+    print_status "Tambien puedes consultar el historial ARRIBA root para guiarte. Por si vuelve a dar ese pantallazo azul con el 🐧  
+    [Y Recuerda Usar:
+    nano /etc/mkinitcpio.conf
+
+    # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd
+    sudo mkinitcpio -P -v]
+
+     󰁃 ¿Diferencias entre usar udev y systemd?
+        󱞩 - systemd: resulta en una .img: 8.6/16mb
+          - udev: resulta en una .img: 206mb
+
+    # EDITAR: HOOKS=(base udev autodetect keyboard keymap modconf block encrypt lvm2 filesystems fsck) # o elige systemd"
   fi
 
   # Recargar servicios
