@@ -57,9 +57,21 @@ while true; do
     notify-send "🗑️ NPM Cache" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   5)
-    echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo...${RESET}"
+    echo -e "\n${YELLOW}⚡ Limpiando ~/.cache completo [& journalctl, docker, electron]...${RESET}"
     rm -rf ~/.cache/*
-    notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
+    # Brave
+    rm -rf ~/.config/BraveSoftware/Brave-Browser/Default/Cache
+    rm -rf ~/.cache/BraveSoftware
+
+    # Firefox
+    rm -rf ~/.mozilla/firefox/*.default*/cache2
+    flatpak uninstall --unused
+    rm -rf ~/.var/app/*/cache/*
+    sudo journalctl --vacuum-size=50M
+    rm -rf ~/.config/{Cursor,discord,Slack}/{Cache,Code\ Cache,GPUCache}/* &&
+      paccache -rk1 && docker system prune -af &&
+      docker builder prune \
+        notify-send "🗑️ CACHE COMPLETO" 'Recuerda reaplicar fondos y ajustar QT5/QT6, lxa y nwglook  🎨'
     ;;
   6)
     echo -e "\n${YELLOW}⚡ Limpiando caché de neovim...${RESET}"
