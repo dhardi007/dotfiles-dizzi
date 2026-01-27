@@ -600,10 +600,10 @@ esac
 # ═══════════════════════════════════════════════════════════
 # Aplicaciones de música y ocio
 # ═══════════════════════════════════════════════════════════
-print_installing "Aplicaciones extra y de Música/OCIO (solo binarios precompilados)"
+print_installing "Aplicaciones extra y de Música/OCIO, Discord/Telegram (solo binarios precompilados)"
 yay -S --needed --noconfirm --answerdiff=None --answerclean=None --removemake \
   brave-bin spotify pear-desktop \
-  vencord-bin gyazo-bin discord-screenaudio-bin \
+  vencord-bin telegram-desktop-bin gyazo-bin discord-screenaudio-bin \
   2>/dev/null || print_warning "Algunas apps fallaron"
 # Youtube Music cambió de nombre a Pear Desktop
 
@@ -1608,7 +1608,20 @@ if [[ -d ~/dotfiles-dizzi ]]; then
     fi
   done
 
-  cd ~
+print_status "Aplicando Submodulos [NVIM]    ."
+
+echo "${BOLD}${CYAN}Paso 1: Clonando repositorios...${RESET}"
+# Verificar submodules
+git submodule update --init --recursive
+rm -rf nvim
+
+# Recuperar cada submódulo
+git submodule update --init --recursive nvim
+
+echo "${BOLD}${CYAN}Paso 2: Corrigiendo el branch main...${RESET}"
+cd  nvim/.config/nvim  && git checkout main
+cd  ../../../
+
   print_success "Dotfiles aplicados"
 fi
 
